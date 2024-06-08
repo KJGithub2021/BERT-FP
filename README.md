@@ -2,7 +2,7 @@
 This repository includes an implementation of Fine-grained Post-training for Improving Retrieval-based Dialogue Systems with faster training and evaluation. The latest version of Python (Python 3.12) may be used.
 
 ## Checkpoint Files
-Download the file here: [pt_data](https://drive.google.com/file/d/18eSZ9Kztj8F0wQ8BrZnPj4Eu7tQk95vR/view?usp=sharing)
+Download the file here: [pt_data](https://drive.google.com/file/d/18eSZ9Kztj8F0wQ8BrZnPj4Eu7tQk95vR/view?usp=sharing) \
 Place it in the following directory: \FPT\PT_checkpoint/ubuntu25/ \
 The remaining checkpoint files are in the repository.
 

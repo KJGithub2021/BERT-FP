@@ -1,26 +1,28 @@
 # BERT-FP Updated Implementation on Ubuntu Corpus
-This repository includes an implemetation of Fine-grained Post-training for Improving Retrieval-based Dialogue Systems with faster training and evaluation. The lastest version of Python (3.12) may be used.
+This repository includes an implementation of Fine-grained Post-training for Improving Retrieval-based Dialogue Systems with faster training and evaluation. The latest version of Python (Python 3.12) may be used.
 
-## Settiing up the Environment
-1. Add the Checkpoint Files \
+## Checkpoint Files
 Download the file here: [pt_data](https://drive.google.com/file/d/18eSZ9Kztj8F0wQ8BrZnPj4Eu7tQk95vR/view?usp=sharing)
-Place it in the following directory: \FPT\PT_checkpoint/ubuntu25/
+Place it in the following directory: \FPT\PT_checkpoint/ubuntu25/ \
+The remaining checkpoint files are in the repository.
 
-3. Download Post Preprocessing Files (Optional) \
-If you would like to skip preprocessing and are using the Ubuntu Corpus dataset, you can download the following files and place them in the ubuntu_data directory
+## Download Post Preprocessing Files (Optional) 
+If you would like to skip preprocessing and are using the Ubuntu Corpus dataset, you can download the following files and place them in the ubuntu_data directory. \
 [ubuntu_dataset_1M.pkl](https://drive.google.com/file/d/1KHx4EHZRcjLXcF18Pmsf3i5OsN7-jHNC/view?usp=sharing) \
-[ubuntu_post_train.pkl]()
+[ubuntu_post_train.pkl](https://drive.google.com/file/d/1R5qE6XSkVIOUykXjaheyo5r3bOkF8LkQ/view?usp=sharing)
 
-5. Datasets \
+## Datasets 
 If you wish to go through the preprocessing stage, you may download the dataset here: [Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing) \
-This repository will also work for the Douban and e-commerce datasets. If you would like to train the model on these, add the dataset to douban_data e_commerce_data directories respectively. Please note that this may require minor modifications as this model has not been tested on the aforementioned datasets.
+This repository will also work for the Douban and e-commerce datasets. If you would like to train the model on these, add the dataset to douban_data e_commerce_data directories, respectively. Please note that this may require minor modifications as this model has not been tested on the aforementioned datasets.
 
-6. Setting up the TPU
+## Setting up the Environment
+1. Setting up the TPU
 ```python
 import jax.tools.colab_tpu
 jax.tools.colab_tpu.setup_tpu()
 ```
-7. Install Necessary Libraries
+
+2. Install Necessary Libraries
 ```python
 !pip install setproctitle
 !pip install transformers
@@ -30,7 +32,7 @@ os.environ.pop('TPU_PROCESS_ADDRESSES')
 os.environ.pop('CLOUD_TPU_TASK_ID')
 ```
 
-7. Configuring the Accelerate Library \
+3. Configuring the Accelerate Library \
 Using this library is optional but it will reduce the training and evaluation time of the model.
 ```python
 !accelerate launch --tpu --num_processes 4 \

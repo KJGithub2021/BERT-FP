@@ -56,7 +56,8 @@ end = time.time()
 print("use time: ", (end - start) / 60, " min")
 ```
 
-Be sure to save the checkpoints, ubuntu.0.pt, for future use.
+If you'd like to skip training and evaluate the model, use the checkpoint files provided \
+[BERT-FP Checkpoint Files](https://drive.google.com/file/d/1-3BgHYeXcMDxE06BGEYX6zdr5SGRaqez/view?usp=drive_link)
 
 ## Acknowledgements
 [BERT-FP Github Repository](https://github.com/hanjanghoon/BERT_FP) \

@@ -16,6 +16,7 @@ If you wish to go through the preprocessing stage, you may download the dataset 
 This repository will also work for the Douban and e-commerce datasets. If you would like to train the model on these, add the dataset to douban_data e_commerce_data directories, respectively. Please note that this may require minor modifications as this model has not been tested on the aforementioned datasets.
 
 ## Setting up the Environment
+This model is compaible with python 3.10
 1. Setting up the TPU
 ```python
 import jax.tools.colab_tpu

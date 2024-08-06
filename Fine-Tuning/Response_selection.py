@@ -12,7 +12,7 @@ setproctitle('BERT_FP')
 
 #Dataset path.
 FT_data={
-    'ubuntu': 'ubuntu_data\\ubuntu_data\\ubuntu_dataset_1M.pkl',
+    'ubuntu': '../ubuntu_data/ubuntu_data/ubuntu_dataset_1M.pkl',
     'douban': 'douban_data/douban_dataset_1M.pkl',
     'e_commerce': 'e_commerce_data/e_commerce_dataset_1M.pkl'
 }
@@ -41,11 +41,11 @@ parser.add_argument("--epochs",
                     type=float,
                     help="Total number of training epochs to perform.")
 parser.add_argument("--save_path",
-                    default="Fine-Tuning/FT_checkpoint/",
+                    default="FT_checkpoint/",
                     type=str,
                     help="The path to save model.")
 parser.add_argument("--score_file_path",
-                    default="./Fine-Tuning/scorefile.txt",
+                    default="scorefile.txt",
                     type=str,
                     help="The path to save model.")
 parser.add_argument("--do_lower_case", action='store_true', default=True,
@@ -82,10 +82,14 @@ if __name__ == '__main__':
     print("use time: ", (end - start) / 60, " min")
     print("Cuda Available true? ", torch.cuda.is_available())
     start = time.time()
+    print(f"is_training: {args.is_training}")
     if args.is_training==True:
+        print("About to start training")
         train_model(train,dev)
+        print("About to start training")
         test_model(test)
     else:
+        print("About to start testing")
         test_model(test)
 
     end = time.time()

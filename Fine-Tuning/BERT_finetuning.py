@@ -10,7 +10,6 @@ from transformers import BertConfig, BertForSequenceClassification, BertTokenize
 from tqdm import tqdm
 from torch.utils.data import Dataset
 import torch.nn.functional as F
-
 FT_model={
     'ubuntu': 'bert-base-uncased',
     'douban': 'bert-base-chinese',
@@ -147,6 +146,7 @@ class NeuralNetwork(nn.Module):
         self.best_result = [0, 0, 0, 0, 0, 0]
         self.metrics = Metrics(self.args.score_file_path)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
 
         config_class, model_class, tokenizer_class = MODEL_CLASSES['bert']
         task = 'ubuntu'
@@ -156,32 +156,48 @@ class NeuralNetwork(nn.Module):
         num_added_toks = self.bert_tokenizer.add_special_tokens(special_tokens_dict)
         self.bert_model = model_class.from_pretrained(FT_model[args.task],config=self.bert_config)
         
+        
+        
 
         self.bert_model.resize_token_embeddings(len(self.bert_tokenizer))
         """You can load the post-trained checkpoint here."""
-        self.bert_model.bert.load_state_dict(state_dict=torch.load("C:\\Users\\Home\\Desktop\\aleesha\\BERT_FP\\FPT\\PT_checkpoint\\ubuntu25\\bert.pt"))
+        #self.bert_model.bert.load_state_dict(state_dict=torch.load("/content/drive/MyDrive/BERT_FP/FPT/PT_checkpoint/ubuntu25/ubuntu.0.pt"))
         #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/douban27/bert.pt"))
         #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/e_commerce34/bert.pt"))
-        
-        self.bert_model = self.bert_model.cuda()
+        sth = state_dict=torch.load("/content/drive/MyDrive/BERT_FP/FPT/PT_checkpoint/ubuntu25/ubuntu.0.pt", map_location=torch.device('cpu'))
+        self.bert_model.load_state_dict(sth, strict=False)
+
+        if torch.cuda.is_available():
+            self.bert_model = self.bert_model.cuda()
+        else:
+            self.bert_model = self.bert_model.to(torch.device('cpu'))
 
     def forward(self):
         raise NotImplementedError
 
     def train_step(self, i, data):
         with torch.no_grad():
-            batch_ids, batch_mask, batch_seg, batch_y, batch_len = (item.cuda(device=self.device) for item in data)
+            # Check if CUDA is available and set the device accordingly
+            if torch.cuda.is_available():
+                device = torch.device('cuda')
+            else:
+                device = torch.device('cpu')
+            batch_ids, batch_mask, batch_seg, batch_y, batch_len =  (item.to(device) for item in data)
 
         self.optimizer.zero_grad()
 
         output = self.bert_model(batch_ids, batch_mask, batch_seg)
 
         logits = torch.sigmoid(output[0])
+        # Print logits and batch_y for debugging
+        print(f"Batch {i}:")
+        print(f"logits (after sigmoid): {logits.squeeze().detach().cpu().numpy()}")
+        print(f"batch_y (targets): {batch_y.detach().cpu().numpy()}")
         loss = self.loss_func(logits.squeeze(), target=batch_y)
         loss.backward()
 
         self.optimizer.step()
-        if i % 100 == 0:
+        if i % 1 == 0:
             print('Batch[{}] - loss: {:.6f}  batch_size:{}'.format(i, loss.item(),
                                                                    batch_y.size(0)))  
         return loss
@@ -201,7 +217,7 @@ class NeuralNetwork(nn.Module):
              'weight_decay': 0.01},
             {'params': [p for n, p in self.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
         ]
-        self.optimizer = AdamW(optimizer_grouped_parameters, lr=self.args.learning_rate,correct_bias=True)  
+        self.optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.args.learning_rate)  
 
         for epoch in range(self.args.epochs):
             print("\nEpoch ", epoch + 1, "/", self.args.epochs)
@@ -235,6 +251,7 @@ class NeuralNetwork(nn.Module):
     def evaluate(self, dev, is_test=False):
         y_pred = self.predict(dev)
         with open(self.args.score_file_path, 'w') as output:
+            print(zip(y_pred, dev['y']))
             for score, label in zip(y_pred, dev['y']):
                 output.write(
                     str(score) + '\t' +
@@ -272,22 +289,33 @@ class NeuralNetwork(nn.Module):
     def predict(self, dev):
         self.eval()
         y_pred = []
-        dataset = BERTDataset(self.args, dev,self.bert_tokenizer)
-        dataloader = DataLoader(dataset, batch_size=400)
-
+        dataset = BERTDataset(self.args, dev, self.bert_tokenizer)
+        dataloader = DataLoader(dataset, batch_size=5)
+        # Set device
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
         for i, data in enumerate(dataloader):
             with torch.no_grad():
-                batch_ids, batch_mask, batch_seg, batch_y, batch_len = (item.cuda() for item in data)
+                batch_ids, batch_mask, batch_seg, batch_y, batch_len = (item.to(device) for item in data)
             with torch.no_grad():
                 output = self.bert_model(batch_ids, batch_mask, batch_seg)
                 logits = torch.sigmoid(output[0]).squeeze()
-
-            if i % 100 == 0:
-                print('Batch[{}] batch_size:{}'.format(i, batch_ids.size(0))) 
-            y_pred += logits.data.cpu().numpy().tolist()
+    
+            if i % 1 == 0:
+                print('Batch[{}] batch_size:{}'.format(i, batch_ids.size(0)))
+    
+            # Ensure logits is a list, even if it contains a single value
+            logits_list = logits.data.cpu().numpy().tolist()
+            if isinstance(logits_list, float):
+                logits_list = [logits_list]
+    
+            y_pred += logits_list
+    
         return y_pred
 
     def load_model(self, path):
-        self.load_state_dict(state_dict=torch.load(path))
-        if torch.cuda.is_available(): self.cuda()
+        self.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        
+        if torch.cuda.is_available(): 
+            self.cuda()
 

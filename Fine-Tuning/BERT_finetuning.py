@@ -10,6 +10,7 @@ from transformers import BertConfig, BertForSequenceClassification, BertTokenize
 from tqdm import tqdm
 from torch.utils.data import Dataset
 import torch.nn.functional as F
+
 FT_model={
     'ubuntu': 'bert-base-uncased',
     'douban': 'bert-base-chinese',
@@ -152,19 +153,16 @@ class NeuralNetwork(nn.Module):
         task = 'ubuntu'
         self.bert_config = config_class.from_pretrained(FT_model[task],num_labels=1)
         self.bert_tokenizer = BertTokenizer.from_pretrained(FT_model[args.task],do_lower_case=args.do_lower_case)
-        special_tokens_dict = {'eos_token': '[eos]'}
+        special_tokens_dict = {'additional_special_tokens': ['__eou__', '__eot__']}
         num_added_toks = self.bert_tokenizer.add_special_tokens(special_tokens_dict)
-        self.bert_model = model_class.from_pretrained(FT_model[args.task],config=self.bert_config)
-        
-        
-        
+        self.bert_model = model_class.from_pretrained(FT_model[args.task],config=self.bert_config)   
 
         self.bert_model.resize_token_embeddings(len(self.bert_tokenizer))
         """You can load the post-trained checkpoint here."""
         #self.bert_model.bert.load_state_dict(state_dict=torch.load("/content/drive/MyDrive/BERT_FP/FPT/PT_checkpoint/ubuntu25/ubuntu.0.pt"))
         #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/douban27/bert.pt"))
         #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/e_commerce34/bert.pt"))
-        sth = state_dict=torch.load("/content/drive/MyDrive/BERT_FP/FPT/PT_checkpoint/ubuntu25/ubuntu.0.pt", map_location=torch.device('cpu'))
+        sth = state_dict=torch.load("/home/kamran/BERT-FP/FPT/PT_checkpoint/ubuntu25/bert.pt")
         self.bert_model.load_state_dict(sth, strict=False)
 
         if torch.cuda.is_available():
@@ -190,14 +188,14 @@ class NeuralNetwork(nn.Module):
 
         logits = torch.sigmoid(output[0])
         # Print logits and batch_y for debugging
-        print(f"Batch {i}:")
-        print(f"logits (after sigmoid): {logits.squeeze().detach().cpu().numpy()}")
-        print(f"batch_y (targets): {batch_y.detach().cpu().numpy()}")
+        #print(f"Batch {i}:")
+        #print(f"logits (after sigmoid): {logits.squeeze().detach().cpu().numpy()}")
+        #print(f"batch_y (targets): {batch_y.detach().cpu().numpy()}")
         loss = self.loss_func(logits.squeeze(), target=batch_y)
         loss.backward()
 
         self.optimizer.step()
-        if i % 1 == 0:
+        if i % 100 == 0:
             print('Batch[{}] - loss: {:.6f}  batch_size:{}'.format(i, loss.item(),
                                                                    batch_y.size(0)))  
         return loss
@@ -251,7 +249,7 @@ class NeuralNetwork(nn.Module):
     def evaluate(self, dev, is_test=False):
         y_pred = self.predict(dev)
         with open(self.args.score_file_path, 'w') as output:
-            print(zip(y_pred, dev['y']))
+            
             for score, label in zip(y_pred, dev['y']):
                 output.write(
                     str(score) + '\t' +
@@ -290,7 +288,7 @@ class NeuralNetwork(nn.Module):
         self.eval()
         y_pred = []
         dataset = BERTDataset(self.args, dev, self.bert_tokenizer)
-        dataloader = DataLoader(dataset, batch_size=5)
+        dataloader = DataLoader(dataset, batch_size=400)
         # Set device
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -301,7 +299,7 @@ class NeuralNetwork(nn.Module):
                 output = self.bert_model(batch_ids, batch_mask, batch_seg)
                 logits = torch.sigmoid(output[0]).squeeze()
     
-            if i % 1 == 0:
+            if i % 100 == 0:
                 print('Batch[{}] batch_size:{}'.format(i, batch_ids.size(0)))
     
             # Ensure logits is a list, even if it contains a single value

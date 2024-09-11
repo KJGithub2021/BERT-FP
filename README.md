@@ -1,5 +1,5 @@
 
-
+-----NOT FINAL YET. ONLY ADDED IMPORTANT DETAILS----
 # Download the following libraries
 numpy
 transformers
@@ -8,7 +8,10 @@ torch
 
 ## Data Processing
 ```python
+[Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing) \
 python Data_processing.py
+[ubuntu_dataset_1M.pkl](https://drive.google.com/file/d/1wXU8-WdsWKqHY_wvJtdSCuju1RtBUB7y/view?usp=sharing)
+[ubuntu_post_train.pkl](https://drive.google.com/file/d/1bhDVLQKQY_fViqFE7D8qiFDSN8vYU4GO/view?usp=sharing)
 
 ```
 
@@ -44,11 +47,7 @@ This repository will also work for the Douban and e-commerce datasets. If you wo
 
 ## Setting up the Environment
 This model is compaible with python 3.10 and tensorflow 2.10.
-1. Setting up the TPU
-```python
-import jax.tools.colab_tpu
-jax.tools.colab_tpu.setup_tpu()
-```
+
 
 2. Install Necessary Libraries
 ```python
@@ -59,14 +58,6 @@ os.environ.pop('TPU_PROCESS_ADDRESSES')
 os.environ.pop('CLOUD_TPU_TASK_ID')
 ```
 
-3. Configuring the Accelerate Library \
-Using this library is optional but it will reduce the training and evaluation time of the model.
-```python
-!accelerate launch --tpu --num_processes 4 \
---num_machines 8 \
---main_training_function main \
- Response_selection.py
-```
 ## Training
 ```python
 start = time.time()

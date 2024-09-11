@@ -21,8 +21,6 @@ import pickle
 
 from torch.utils.data import Dataset
 import random
-from setproctitle import setproctitle
-setproctitle('jaden han')
 
 torch.manual_seed(0)
 torch.cuda.manual_seed_all(0)

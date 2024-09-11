@@ -1,5 +1,32 @@
-# BERT-FP Updated Implementation on Ubuntu Corpus
-This repository includes an implementation of Fine-grained Post-training for Improving Retrieval-based Dialogue Systems with faster training and evaluation. The latest version of Python (Python 3.12) may be used.
+
+
+# Download the following libraries
+numpy
+transformers
+tqdm
+torch
+
+## Data Processing
+```python
+python Data_processing.py
+
+```
+
+## Post-Training
+Run python -u FPT/ubuntu_final.py --num_train_epochs 25
+
+## Fine Tuning
+Run python -u Fine-Tuning/Response_selection.py --is_training True
+
+## Evaluation
+Run python -u Fine-Tuning/Response_selection.py --is_training False
+
+## Calculate Rouge Score
+Run Fine-Tuning/rouger.py
+
+_______________
+
+
 
 ## Checkpoint Files
 Download the file here: [pt_data](https://drive.google.com/file/d/18eSZ9Kztj8F0wQ8BrZnPj4Eu7tQk95vR/view?usp=sharing) \
@@ -25,7 +52,6 @@ jax.tools.colab_tpu.setup_tpu()
 
 2. Install Necessary Libraries
 ```python
-!pip install setproctitle
 !pip install transformers
 !pip install accelerate
 import os

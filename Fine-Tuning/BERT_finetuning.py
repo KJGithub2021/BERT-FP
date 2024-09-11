@@ -153,16 +153,13 @@ class NeuralNetwork(nn.Module):
         task = 'ubuntu'
         self.bert_config = config_class.from_pretrained(FT_model[task],num_labels=1)
         self.bert_tokenizer = BertTokenizer.from_pretrained(FT_model[args.task],do_lower_case=args.do_lower_case)
-        special_tokens_dict = {'additional_special_tokens': ['__eou__', '__eot__']}
+        special_tokens_dict = {'eos_token': '[eos]'}
         num_added_toks = self.bert_tokenizer.add_special_tokens(special_tokens_dict)
         self.bert_model = model_class.from_pretrained(FT_model[args.task],config=self.bert_config)   
 
         self.bert_model.resize_token_embeddings(len(self.bert_tokenizer))
         """You can load the post-trained checkpoint here."""
-        #self.bert_model.bert.load_state_dict(state_dict=torch.load("/content/drive/MyDrive/BERT_FP/FPT/PT_checkpoint/ubuntu25/ubuntu.0.pt"))
-        #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/douban27/bert.pt"))
-        #self.bert_model.bert.load_state_dict(state_dict=torch.load("./FPT/PT_checkpoint/e_commerce34/bert.pt"))
-        sth = state_dict=torch.load("/home/kamran/BERT-FP/FPT/PT_checkpoint/ubuntu25/bert.pt")
+        sth = state_dict=torch.load("/home/l215775/BERT-FP/FPT/PT_checkpoint/ubuntu25/bert.pt")
         self.bert_model.load_state_dict(sth, strict=False)
 
         if torch.cuda.is_available():

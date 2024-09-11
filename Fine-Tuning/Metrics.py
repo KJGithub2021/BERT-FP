@@ -1,7 +1,7 @@
 import numpy as np
 np.random.seed(0)
 #This code based on https://github.com/chunyuanY/Dialogue metric
-print("abchhhhhhh")
+
 
 class Metrics(object):
 

@@ -3,16 +3,14 @@ import argparse
 import pickle
 import os
 from BERT_finetuning import NeuralNetwork
-from setproctitle import setproctitle
 import torch
 
-setproctitle('BERT_FP')
 
 
 
 #Dataset path.
 FT_data={
-    'ubuntu': 'ubuntu_dataset_1M.pkl',
+    'ubuntu': 'ubuntu_data/ubuntu_dataset_1M.pkl',
     'douban': 'douban_data/douban_dataset_1M.pkl',
     'e_commerce': 'e_commerce_data/e_commerce_dataset_1M.pkl'
 }
@@ -75,39 +73,8 @@ def test_model(test):
 
 if __name__ == '__main__':
     start = time.time()
-    with open(FT_data[args.task], 'rb') as f:
-        from transformers import BertTokenizer
-        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        train, dev, test = pickle.load(f, encoding='ISO-8859-1')
-        # Check the type and structure of `test`
-        print(f"Type of test: {type(test)}")
-        
-        # If it's a dictionary, print the keys
-        if isinstance(test, dict):
-            print(f"Keys in test: {list(test.keys())}")
-        
-        # If it's a list or other structure, print some content
-        else:
-            print(f"First item in test: {test[0]}")
-        for i in range(0, 30, 10):
-            token_ids = train['cr'][i] 
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
-            sentence = tokenizer.decode(token_ids, skip_special_tokens=False)
-            print(f"Original tokens: {token_ids}")
-            print(f"Translated sentence: {sentence}")
-
-            token_ids = dev['cr'][i] 
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
-            sentence = tokenizer.decode(token_ids, skip_special_tokens=False)
-            print(f"Original tokens: {token_ids}")
-            print(f"Translated sentence: {sentence}")
-
-            token_ids = test['cr'][i] 
-            tokens = tokenizer.convert_ids_to_tokens(token_ids)
-            sentence = tokenizer.decode(token_ids, skip_special_tokens=False)
-            print(f"Original tokens: {token_ids}")
-            print(f"Translated sentence: {sentence}")
-            
+    with open(FT_data[args.task], 'rb') as f:   
+        train, dev, test = pickle.load(f, encoding='ISO-8859-1')      
     print("Loading Data done")
     end = time.time()
     print("use time: ", (end - start) / 60, " min")
@@ -121,7 +88,3 @@ if __name__ == '__main__':
 
     end = time.time()
     print("use time: ", (end - start) / 60, " min")
-
-
-
-

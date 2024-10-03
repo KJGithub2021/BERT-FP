@@ -74,17 +74,19 @@ def test_model(test):
 if __name__ == '__main__':
     start = time.time()
     with open(FT_data[args.task], 'rb') as f:   
-        train, dev, test = pickle.load(f, encoding='ISO-8859-1')      
+        train, dev, test = pickle.load(f, encoding='ISO-8859-1')  
+
     print("Loading Data done")
     end = time.time()
     print("use time: ", (end - start) / 60, " min")
     print("Cuda Available true? ", torch.cuda.is_available())
     start = time.time()
+
     if args.is_training==True:
         train_model(train,dev)
         test_model(test)
     else:
-        test_model(test)
+        test_model(test)    
 
     end = time.time()
     print("use time: ", (end - start) / 60, " min")

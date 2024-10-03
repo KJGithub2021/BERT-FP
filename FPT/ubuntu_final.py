@@ -29,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def warmup_linear(x, warmup=0.002):
     if x < warmup:
@@ -372,12 +372,12 @@ def main():
                         type=int,
                         help="Total batch size for training.")
     parser.add_argument("--learning_rate",
-                        default=1.5e-5,
+                        default=3e-5,
                         type=float,
                         help="The initial learning rate for Adam.")
     parser.add_argument("--num_train_epochs",
-                        default=2.0,
-                        type=float,
+                        default=25,
+                        type=int,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--warmup_proportion",
                         default=0.01,
@@ -394,7 +394,7 @@ def main():
 
     args = parser.parse_args()
 
-    device = torch.device("cuda")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     if args.gradient_accumulation_steps < 1:
         raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
@@ -414,10 +414,15 @@ def main():
     model.resize_token_embeddings(len(tokenizer))
     model.cls.seq_relationship = nn.Linear(bertconfig.hidden_size, 3)
     #load checkpoint here
-    #model.bert.load_state_dict(state_dict=torch.load("ubuntu_final/checkpoint20-1637300/bert.pt"))
+    state_dict = torch.load("FPT/PT_checkpoint/ubuntu/checkpoint3-130533-30_9/bert.pt")
+
+    # Load the model
+    missing_keys, unexpected_keys = model.bert.load_state_dict(state_dict, strict=False)
+    print(f"Missing keys: {missing_keys}")
+    print(f"Unexpected keys: {unexpected_keys}")
+
+    print(torch.cuda.is_available())
     model.to(device)
-
-
 
     
     num_train_steps = None
@@ -436,7 +441,7 @@ def main():
         {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
         ]
 
-    optimizer = AdamW(optimizer_grouped_parameters,lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
 
     global_step = 0
     logger.info("***** Running training *****")
@@ -455,11 +460,13 @@ def main():
         tr_loss = 0
         for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration",position=0)):
             with torch.no_grad():
-                batch = (item.cuda(device=device) for item in batch)
+                batch = (item.to(device) for item in batch)
+                
             input_ids, input_mask, segment_ids,lm_label_ids, is_next = batch
             model.train()
             optimizer.zero_grad()
-            prediction_scores, seq_relationship_score = model(input_ids=input_ids,attention_mask= input_mask, token_type_ids=segment_ids)
+            prediction_scores, seq_relationship_score = model(input_ids=input_ids,attention_mask= input_mask, token_type_ids=segment_ids).to_tuple()
+            
             #logits = torch.sigmoid(output[0].squeeze())
             if lm_label_ids is not None and is_next is not None:
                 loss_fct = CrossEntropyLoss(ignore_index=-1)
@@ -470,7 +477,7 @@ def main():
 
             model.zero_grad()
             loss = total_loss
-            if step%100==0:
+            if step%1000==0:
                 print('Batch[{}] - loss: {:.6f}  batch_size:{}'.format(step, loss.item(),args.train_batch_size) )
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps

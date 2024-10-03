@@ -158,10 +158,20 @@ class NeuralNetwork(nn.Module):
         self.bert_model = model_class.from_pretrained(FT_model[args.task],config=self.bert_config)   
 
         self.bert_model.resize_token_embeddings(len(self.bert_tokenizer))
-        """You can load the post-trained checkpoint here."""
-        sth = state_dict=torch.load("/home/l215775/BERT-FP/FPT/PT_checkpoint/ubuntu25/bert.pt")
-        self.bert_model.load_state_dict(sth, strict=False)
 
+        """You can load the post-trained checkpoint here."""
+        state_dict = torch.load("FPT/PT_checkpoint/ubuntu/checkpoint1-43511/bert.pt")
+
+        """Or You can load the fine-tuned checkpoint here."""
+        #state_dict = torch.load("Fine-Tuning/FT_checkpoint/ubuntu.0.pt")
+        
+
+        # Load the model
+        missing_keys, unexpected_keys = self.bert_model.bert.load_state_dict(state_dict, strict=False)
+        print(f"Missing keys: {missing_keys}")
+        print(f"Unexpected keys: {unexpected_keys}")
+
+        print("torch.cuda.is_available(): ", torch.cuda.is_available())
         if torch.cuda.is_available():
             self.bert_model = self.bert_model.cuda()
         else:
@@ -192,7 +202,7 @@ class NeuralNetwork(nn.Module):
         loss.backward()
 
         self.optimizer.step()
-        if i % 100 == 0:
+        if i % 1000 == 0:
             print('Batch[{}] - loss: {:.6f}  batch_size:{}'.format(i, loss.item(),
                                                                    batch_y.size(0)))  
         return loss
@@ -214,12 +224,13 @@ class NeuralNetwork(nn.Module):
         ]
         self.optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.args.learning_rate)  
 
-        for epoch in range(self.args.epochs):
+        for epoch in range(self.args.epochs): 
+            
             print("\nEpoch ", epoch + 1, "/", self.args.epochs)
             avg_loss = 0
 
             self.train()
-            for i, data in tqdm(enumerate(dataloader)): 
+            for i, data in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {epoch + 1}", unit="batch"):
                 if epoch >= 2 and self.patience >= 3:
                     print("Reload the best model...")
                     self.load_state_dict(torch.load(self.args.save_path))
@@ -232,8 +243,10 @@ class NeuralNetwork(nn.Module):
                     utils.clip_grad_norm_(self.parameters(), max_norm=self.init_clip_max_norm)
 
                 avg_loss += loss.item()
+
             cnt = len(train['y']) // self.args.batch_size + 1
             print("Average loss:{:.6f} ".format(avg_loss / cnt))
+            
 
             self.evaluate(dev)
 
@@ -276,7 +289,7 @@ class NeuralNetwork(nn.Module):
                   "R5:", self.best_result[5])
             self.patience = 0
             self.best_result = result
-            torch.save(self.state_dict(), self.args.save_path)
+            torch.save(self.bert_model.bert.state_dict(), self.args.save_path)
             print("save model!!!\n")
         else:
             self.patience += 1

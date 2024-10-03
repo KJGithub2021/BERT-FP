@@ -1,2 +1,4 @@
-/ubuntu_data/*
+/ubuntu_data/*.txt
+/ubuntu_data/*.pkl
 *.pyc
+/__pycache__/

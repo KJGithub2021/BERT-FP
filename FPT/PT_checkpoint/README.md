@@ -1,1 +1,1 @@
-Post-Training checkpoint'bert.pt' will be created here.
+Post-Training checkpoint 'bert.pt' will be created here.

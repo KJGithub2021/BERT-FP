@@ -91,7 +91,7 @@ def calculate_rouge(response_data, response_ids, scores_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Calculate ROUGE scores for test data.")
     parser.add_argument('--num_of_responses', type=int, default=None,
-                        help="Specify fixed number of responses per test line. Add if you skipped test lines that didn't match the number. If not provided, all lines are used.")
+                        help="Specify fixed number of responses per test line. Add this if you skipped test lines that didn't match the fixed number. If not provided, all lines are used.")
     
     args = parser.parse_args()
 

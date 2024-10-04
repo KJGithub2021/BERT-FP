@@ -1,9 +1,10 @@
 # BERT-FP for Dialogue Systems
 
-This repository contains the implementation of BERT-FP for improving retrieval-based dialogue systems.
+This repository contains the implementation of BERT-FP using Ubuntu Dialogue Corpus V2.
 
 ## Prerequisites
 This model is compaible with python 3.12 and torch 2.6.0.dev20240923+cu121
+
 Before you begin, ensure you have the following libraries installed:
 
 ```
@@ -62,14 +63,14 @@ For evaluation, run:
 ```python
 python -u Fine-Tuning/Response_selection.py --is_training False
 ```
-This will generate a scorefile.txt containing prediction scores.
+This will print evaluation metrics and will generate a prediction-score file like [scorefile.txt]().
 
 ## Calculate ROUGE Score
 
 To calculate the ROUGE score, execute:
 
 ```python
-python Fine-Tuning/calculate_rouge.py
+python compute_rouge.py
 ```
 
 ## Acknowledgements

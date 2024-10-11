@@ -22,7 +22,7 @@ parser.add_argument("--task",
                     type=str,
                     help="The dataset used for training and test.")
 parser.add_argument("--is_training",
-                    default=True,
+                    type=bool,
                     help="Training model or testing model?")
 parser.add_argument("--batch_size",
                     default=64,

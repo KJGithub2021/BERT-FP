@@ -13,13 +13,13 @@ transformers
 tqdm
 torch
 evaluate
-rouge
+rouge_score
 ```
 
 You can install these using pip:
 
 ```python
-pip install numpy transformers tqdm evaluate rouge
+pip install numpy transformers tqdm evaluate rouge_score
 ```
 
 ## Data Processing

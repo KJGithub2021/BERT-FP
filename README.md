@@ -19,6 +19,7 @@ rouge_score
 You can install these using pip:
 
 ```python
+pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121 
 pip install numpy transformers tqdm evaluate rouge_score
 ```
 

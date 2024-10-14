@@ -22,7 +22,7 @@ parser.add_argument("--task",
                     type=str,
                     help="The dataset used for training and test.")
 parser.add_argument("--is_training",
-                    type=bool,
+                    type=str,
                     help="Training model or testing model?")
 parser.add_argument("--batch_size",
                     default=64,
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     print("Cuda Available true? ", torch.cuda.is_available())
     start = time.time()
 
-    if args.is_training==True:
+    if args.is_training=='True':
         train_model(train,dev)
         test_model(test)
     else:

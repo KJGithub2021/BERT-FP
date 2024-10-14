@@ -30,7 +30,7 @@ def load_responseids(test_file, num_of_responses):
         reference_id = parts[2]
         negative_ids = parts[3].split('|')
 
-        # Skip test lines which do not num of responses specified
+        # Skip test lines which do not match num of specified responses
         if num_of_responses and len(negative_ids) != num_of_responses - 1:
             responses_skipped += 1
             continue

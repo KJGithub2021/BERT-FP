@@ -160,17 +160,11 @@ class NeuralNetwork(nn.Module):
         self.bert_model.resize_token_embeddings(len(self.bert_tokenizer))
 
         """You can load the post-trained checkpoint here."""
-        state_dict = torch.load("FPT/PT_checkpoint/ubuntu/checkpoint1-43511/bert.pt")
+        #self.load_model("FPT/PT_checkpoint/ubuntu/checkpoint1-43511/bert.pt")
 
         """Or You can load the fine-tuned checkpoint here."""
-        #state_dict = torch.load("Fine-Tuning/FT_checkpoint/ubuntu.0.pt")
+        self.load_model("Fine-Tuning/FT_checkpoint/ubuntu.0.pt")
         
-
-        # Load the model
-        missing_keys, unexpected_keys = self.bert_model.bert.load_state_dict(state_dict, strict=False)
-        print(f"Missing keys: {missing_keys}")
-        print(f"Unexpected keys: {unexpected_keys}")
-
         print("torch.cuda.is_available(): ", torch.cuda.is_available())
         if torch.cuda.is_available():
             self.bert_model = self.bert_model.cuda()
@@ -233,7 +227,8 @@ class NeuralNetwork(nn.Module):
             for i, data in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {epoch + 1}", unit="batch"):
                 if epoch >= 2 and self.patience >= 3:
                     print("Reload the best model...")
-                    self.load_state_dict(torch.load(self.args.save_path))
+                    self.load_model(self.args.save_path)
+                    #self.load_state_dict(torch.load(self.args.save_path))
                     self.adjust_learning_rate()
                     self.patience = 0
 
@@ -289,41 +284,56 @@ class NeuralNetwork(nn.Module):
                   "R5:", self.best_result[5])
             self.patience = 0
             self.best_result = result
-            torch.save(self.bert_model.bert.state_dict(), self.args.save_path)
+            torch.save(self.state_dict(), self.args.save_path)
             print("save model!!!\n")
         else:
             self.patience += 1
 
     def predict(self, dev):
         self.eval()
+
         y_pred = []
         dataset = BERTDataset(self.args, dev, self.bert_tokenizer)
         dataloader = DataLoader(dataset, batch_size=400)
+
         # Set device
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
         for i, data in enumerate(dataloader):
             with torch.no_grad():
                 batch_ids, batch_mask, batch_seg, batch_y, batch_len = (item.to(device) for item in data)
-            with torch.no_grad():
                 output = self.bert_model(batch_ids, batch_mask, batch_seg)
                 logits = torch.sigmoid(output[0]).squeeze()
-    
+
             if i % 100 == 0:
                 print('Batch[{}] batch_size:{}'.format(i, batch_ids.size(0)))
-    
+
             # Ensure logits is a list, even if it contains a single value
             logits_list = logits.data.cpu().numpy().tolist()
             if isinstance(logits_list, float):
                 logits_list = [logits_list]
-    
+
             y_pred += logits_list
-    
+        
+        del dataset, dataloader
+        torch.cuda.empty_cache()  # Clear cache after prediction
+
         return y_pred
 
+
     def load_model(self, path):
-        self.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-        
-        if torch.cuda.is_available(): 
-            self.cuda()
+        # Load state_dict from checkpoint
+        state_dict = torch.load(path)
+
+        # Add 'bert_model.bert.' prefix if needed
+        if not list(state_dict.keys())[0].startswith('bert_model.bert.'):
+            state_dict = {'bert_model.bert.' + k: v for k, v in state_dict.items()}
+
+        # Load the state_dict into the model
+        missing_keys, unexpected_keys = self.load_state_dict(state_dict, strict=False)
+
+        # Print first 10 keys, missing, and unexpected keys
+        #print(f"Missing keys: {list(missing_keys)[:10]}")
+        #print(f"Unexpected keys: {list(unexpected_keys)[:10]}")
+
 

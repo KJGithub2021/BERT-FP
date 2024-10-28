@@ -80,4 +80,4 @@ python compute_rouge.py
 
 ## Log Files
 
-We have shared the following log files from our experiments for your reference in the `Log Files` folder
+We have shared log files from our experiments in the `Log Files` folder

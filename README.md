@@ -64,7 +64,7 @@ For evaluation, run:
 ```python
 python -u Fine-Tuning/Response_selection.py --is_training False
 ```
-This will print evaluation metrics and will generate a prediction-score file like [scorefile.txt](https://drive.google.com/file/d/1ByFYTJR-tInxfMGN4YGQYpxhc4Uxhirv/view?usp=sharing).
+This will print evaluation metrics and will generate a prediction-score file like [scorefile.txt](https://github.com/Shmdtalha/BERT-FP-Updated-Implementation-on-Ubuntu-Corpus/blob/main/Log%20Files/scorefile.txt).
 
 ## Calculate ROUGE Score
 

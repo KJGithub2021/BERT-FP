@@ -46,7 +46,11 @@ Run the following command:
 ```python
 python -u FPT/ubuntu_final.py --num_train_epochs 10
 ```
-You may skip this step by placing [bert.pt](https://drive.google.com/file/d/1XM1oRiwMnqW8-P-IS_heUBJykqW7VEdd/view?usp=sharing) in the FPT/PT_checkpoint folder.
+You may skip this step by placing [bert.pt](https://drive.google.com/file/d/1XM1oRiwMnqW8-P-IS_heUBJykqW7VEdd/view?usp=sharing) in the FPT/PT_checkpoint folder. You will have to
+edit the file path where this comment is written in BERT_finetuning.py:
+```python
+        """You can load the post-trained checkpoint here."""
+```
 
 ### Fine-Tuning
 

@@ -25,7 +25,7 @@ pip install numpy transformers tqdm evaluate rouge_score
 
 ## Data Processing
 
-1. Download the [Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing). Place the files in the ubuntu_data folder.
+1. Download the [Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing). Place the files in an `ubuntu_data` folder.
 
 2. Process the data by running:
 
@@ -37,7 +37,7 @@ pip install numpy transformers tqdm evaluate rouge_score
    - [ubuntu_dataset_1M.pkl](https://drive.google.com/file/d/1wXU8-WdsWKqHY_wvJtdSCuju1RtBUB7y/view?usp=sharing)
    - [ubuntu_post_train.pkl](https://drive.google.com/file/d/1bhDVLQKQY_fViqFE7D8qiFDSN8vYU4GO/view?usp=sharing)
   
-You may skip this step by placing these two files in a `BERT-FP/ubuntu_data/` folder
+You may skip this step by placing these two files in the `ubuntu_data` folder
 
 ## Training Pipeline
 

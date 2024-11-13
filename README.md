@@ -25,7 +25,7 @@ pip install numpy transformers tqdm evaluate rouge_score
 
 ## Data Processing
 
-1. Download the [Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing). Place the files in an `ubuntu_data` folder.
+1. Download the [Ubuntu Dialogue Corpus](https://drive.google.com/drive/folders/1cm1v3njWPxG5-XhEUpGH25TMncaPR7OM?usp=sharing). Place the files in the `ubuntu_data` folder.
 
 2. Process the data by running:
 

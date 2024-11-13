@@ -36,6 +36,8 @@ pip install numpy transformers tqdm evaluate rouge_score
 3. After processing, you should have the following files:
    - [ubuntu_dataset_1M.pkl](https://drive.google.com/file/d/1wXU8-WdsWKqHY_wvJtdSCuju1RtBUB7y/view?usp=sharing)
    - [ubuntu_post_train.pkl](https://drive.google.com/file/d/1bhDVLQKQY_fViqFE7D8qiFDSN8vYU4GO/view?usp=sharing)
+  
+You may skip this step by placing these two files in a `BERT-FP/ubuntu_data/` folder
 
 ## Training Pipeline
 
